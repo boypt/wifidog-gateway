@@ -168,6 +168,7 @@ typedef struct {
 				     firewall rules */
     char *gw_id;                /**< @brief ID of the Gateway, sent to central
 				     server */
+    char *gw_mac;                   /**< @brief MAC address of the interface we manage */
     char *gw_interface;         /**< @brief Interface we will accept connections on */
     char *gw_address;           /**< @brief Internal IP address for our web
 				     server */
