@@ -104,6 +104,9 @@ ping(void)
     t_auth_serv *auth_server = NULL;
     auth_server = get_auth_server();
     static int authdown = 0;
+    const s_config *config;
+
+    config = config_get_config();
 
     debug(LOG_DEBUG, "Entering ping()");
     memset(request, 0, sizeof(request));
@@ -157,13 +160,14 @@ ping(void)
      * Prep & send request
      */
     snprintf(request, sizeof(request) - 1,
-             "GET %s%sgw_id=%s&sys_uptime=%lu&sys_memfree=%u&sys_load=%.2f&wifidog_uptime=%lu HTTP/1.0\r\n"
+             "GET %s%sgw_id=%s&gw_mac=%s&sys_uptime=%lu&sys_memfree=%u&sys_load=%.2f&wifidog_uptime=%lu HTTP/1.0\r\n"
              "User-Agent: WiFiDog %s\r\n"
              "Host: %s\r\n"
              "\r\n",
              auth_server->authserv_path,
              auth_server->authserv_ping_script_path_fragment,
-             config_get_config()->gw_id,
+             config->gw_id,
+             config->gw_mac,
              sys_uptime,
              sys_memfree,
              sys_load,
