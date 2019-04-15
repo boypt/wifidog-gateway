@@ -321,6 +321,8 @@ http_callback_disconnect(httpd * webserver, request * r)
         logout_client(client);
         UNLOCK_CLIENT_LIST();
 
+        httpdOutput(r, "Logged out.");
+
     } else {
         debug(LOG_INFO, "Disconnect called without both token and MAC given");
         httpdOutput(r, "Both the token and MAC need to be specified");
