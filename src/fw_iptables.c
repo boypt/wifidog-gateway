@@ -293,7 +293,7 @@ iptables_fw_init(void)
     iptables_do_command("-t mangle -I POSTROUTING 1 -o %s -j " CHAIN_INCOMING, config->gw_interface);
 
     for (p = config->trustedmaclist; p != NULL; p = p->next)
-        iptables_do_command("-t mangle -A " CHAIN_TRUSTED " -m mac --mac-source %s -j MARK --set-mark %d", p->mac,
+        iptables_do_command("-t mangle -A " CHAIN_TRUSTED " -m mac --mac-source %s -j MARK --set-mark %d/0xff", p->mac,
                             FW_MARK_KNOWN);
 
     /*
@@ -566,13 +566,13 @@ iptables_fw_access(fw_access_t type, const char *ip, const char *mac, int tag)
 
     switch (type) {
     case FW_ACCESS_ALLOW:
-        iptables_do_command("-t mangle -A " CHAIN_OUTGOING " -s %s -m mac --mac-source %s -j MARK --set-mark %d", ip,
+        iptables_do_command("-t mangle -A " CHAIN_OUTGOING " -s %s -m mac --mac-source %s -j MARK --set-mark %d/0xff", ip,
                             mac, tag);
         rc = iptables_do_command("-t mangle -A " CHAIN_INCOMING " -d %s -j ACCEPT", ip);
         break;
     case FW_ACCESS_DENY:
         /* XXX Add looping to really clear? */
-        iptables_do_command("-t mangle -D " CHAIN_OUTGOING " -s %s -m mac --mac-source %s -j MARK --set-mark %d", ip,
+        iptables_do_command("-t mangle -D " CHAIN_OUTGOING " -s %s -m mac --mac-source %s -j MARK --set-mark %d/0xff", ip,
                             mac, tag);
         rc = iptables_do_command("-t mangle -D " CHAIN_INCOMING " -d %s -j ACCEPT", ip);
         break;
@@ -614,7 +614,7 @@ iptables_fw_auth_unreachable(int tag)
 {
     int got_authdown_ruleset = NULL == get_ruleset(FWRULESET_AUTH_IS_DOWN) ? 0 : 1;
     if (got_authdown_ruleset)
-        return iptables_do_command("-t mangle -A " CHAIN_AUTH_IS_DOWN " -j MARK --set-mark 0x%u", tag);
+        return iptables_do_command("-t mangle -A " CHAIN_AUTH_IS_DOWN " -j MARK --set-mark 0x%u/0xff", tag);
     else
         return 1;
 }
